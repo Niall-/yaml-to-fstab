@@ -10,10 +10,32 @@ use structopt::StructOpt;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "yaml-to-fstab")]
 struct Opt {
-    #[structopt(short, long)]
-    conf: String,
-    #[structopt(short, long)]
+    #[structopt(short, long, help = "Input yaml to parse")]
+    input: String,
+    #[structopt(short, long, help = "Performs a dry run")]
     dry_run: bool,
+    #[structopt(
+        long,
+        default_value = "0",
+        help = "Global value for fs_freq/dump\n\
+                Should be either 0 or 1"
+    )]
+    dump: isize,
+    #[structopt(
+        long,
+        default_value = "0",
+        // I don't think this is true but any other value seems unusual
+        help = "Global value for fs_passno/fsck\n\
+                Should be either 0, 1, or 2"
+    )]
+    fsck: isize,
+    // TODO: this could probably be more granular with /boot and remote filessytems
+    #[structopt(
+        long,
+        help = "Sets the root partition to 1, all other partitions to 2\n\
+                If enabled, ignores --dump and --fsck options"
+    )]
+    smart_fsck: bool,
 }
 
 #[derive(Deserialize, Debug)]
@@ -35,7 +57,17 @@ struct Mounts {
 
 fn main() -> Result<()> {
     let opt = Opt::from_args();
-    let path = Path::new(&opt.conf);
+
+    match opt.dump {
+        0 | 1 => (),
+        _ => panic!("--dump should be either 0 or 1"),
+    }
+    match opt.fsck {
+        0 | 1 | 2 => (),
+        _ => panic!("--fsck should be between 0 and 2"),
+    }
+
+    let path = Path::new(&opt.input);
     let input_file = File::open(path)?;
     let input_reader = BufReader::new(input_file);
 
@@ -102,13 +134,16 @@ fn main() -> Result<()> {
         }
         entry.push_str(&fs_mntops);
 
-        // finally more assumptions here about dump and pass
-        // for now we'll just default to 0 0, this will be
-        // easy enough to change, we can probably make some
-        // safe assumptions about pass based on mount point
-        // or we could just demand user input for them like
-        // with fs_mntops
-        entry.push_str(&format!(" 0 0"));
+        match opt.smart_fsck {
+            true => {
+                let root = match args.mount.as_ref() {
+                    "/" => 1,
+                    _ => 2,
+                };
+                entry.push_str(&format!(" {} {}", opt.dump, root));
+            }
+            false => entry.push_str(&format!(" {} {}", opt.dump, opt.fsck)),
+        }
 
         // tests shouldn't be necessary as serde will panic
         // if the yaml doesn't contain a mount point and fs type
