@@ -12,6 +12,8 @@ use structopt::StructOpt;
 struct Opt {
     #[structopt(short, long)]
     conf: String,
+    #[structopt(short, long)]
+    dry_run: bool,
 }
 
 #[derive(Deserialize, Debug)]
@@ -116,19 +118,30 @@ fn main() -> Result<()> {
         fstab_entries.push(entry);
     }
 
-    let fstab_path = Path::new("/etc/fstab");
-    let fstab_file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .append(true)
-        .open(fstab_path)?;
-    let mut writer = BufWriter::new(fstab_file);
-    for f in fstab_entries {
-        let entry = format!("{}\n", f);
-        writer.write(entry.as_bytes())?;
-        println!("Adding to /etc/fstab:    {}", f);
+    match opt.dry_run {
+        false => {
+            let fstab_path = Path::new("/etc/fstab");
+            let fstab_file = OpenOptions::new()
+                .read(true)
+                .write(true)
+                .append(true)
+                .open(fstab_path)?;
+            let mut writer = BufWriter::new(fstab_file);
+            for f in fstab_entries {
+                let entry = format!("{}\n", f);
+                writer.write(entry.as_bytes())?;
+                println!("Adding to /etc/fstab:    {}", f);
+            }
+            writer.flush()?;
+        }
+        true => {
+            println!("--- dry run ---");
+            for f in fstab_entries {
+                println!("Adding to /etc/fstab:    {}", f);
+            }
+            println!("--- dry run ---");
+        }
     }
-    writer.flush()?;
 
     Ok(())
 }
