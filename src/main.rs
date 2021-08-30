@@ -2,7 +2,9 @@ use anyhow::Result;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::BufReader;
+use std::fs::OpenOptions;
+use std::io::{BufReader, BufWriter, Write};
+use std::path::Path;
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
@@ -31,10 +33,11 @@ struct Mounts {
 
 fn main() -> Result<()> {
     let opt = Opt::from_args();
-    let file = File::open(&opt.conf)?;
-    let reader = BufReader::new(file);
+    let path = Path::new(&opt.conf);
+    let input_file = File::open(path)?;
+    let input_reader = BufReader::new(input_file);
 
-    let mounts: Input = serde_yaml::from_reader(reader)?;
+    let mounts: Input = serde_yaml::from_reader(input_reader)?;
 
     let mut fstab_entries = Vec::<String>::new();
     for (device, args) in mounts.fstab {
@@ -49,11 +52,10 @@ fn main() -> Result<()> {
         // remote path on the nfs mount and args.mount is the mount point, if this
         // is wrong simply replace args.export and args.mount
         match args.fs_type.to_lowercase().as_ref() {
-            "nfs" => fs_spec.push_str(&format!(
-                "{}:{}",
-                &device,
-                args.export.expect("NFS mount with no export path")
-            )),
+            "nfs" => {
+                let export = args.export.as_ref().expect("NFS mount with no export path");
+                fs_spec.push_str(&format!("{}:{}", &device, export));
+            }
             _ => fs_spec.push_str(&device),
         };
         entry.push_str(&fs_spec);
@@ -81,7 +83,7 @@ fn main() -> Result<()> {
         // but could also be a red herring, however it'll allow us to pass
         // mke2fs args as fstab mounting options, where -m appears to be
         // `-m reserved-blocks-percentage`
-        if let Some(r) = args.root_reserve {
+        if let Some(r) = args.root_reserve.as_ref() {
             match args.fs_type.to_lowercase().as_ref() {
                 "ext2" | "ext3" | "ext4" => {
                     // this parsing could go very wrong, assume that it's consistent and panic if not
@@ -96,7 +98,6 @@ fn main() -> Result<()> {
                 _ => panic!("root-reserve was provided on a non-ext filesystem"),
             }
         }
-
         entry.push_str(&fs_mntops);
 
         // finally more assumptions here about dump and pass
@@ -128,9 +129,19 @@ fn main() -> Result<()> {
         fstab_entries.push(entry);
     }
 
+    let fstab_path = Path::new("/etc/fstab");
+    let fstab_file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .append(true)
+        .open(fstab_path)?;
+    let mut writer = BufWriter::new(fstab_file);
     for f in fstab_entries {
-        println!("{}", f);
+        let entry = format!("{}\n", f);
+        writer.write(entry.as_bytes())?;
+        println!("Adding to /etc/fstab:    {}", f);
     }
+    writer.flush()?;
 
     Ok(())
 }
