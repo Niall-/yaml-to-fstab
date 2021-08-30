@@ -81,28 +81,20 @@ fn main() -> Result<()> {
         // but could also be a red herring, however it'll allow us to pass
         // mke2fs args as fstab mounting options, where -m appears to be
         // `-m reserved-blocks-percentage`
-        //
-        // also TODO: since it's root-reserve maybe add a check here to see
-        // if the mount point is actually root, for now let's just assume
-        // that the yaml is correct
-        match args.root_reserve {
-            Some(r) => match args.fs_type.to_lowercase().as_ref() {
+        if let Some(r) = args.root_reserve {
+            match args.fs_type.to_lowercase().as_ref() {
                 "ext2" | "ext3" | "ext4" => {
                     // this parsing could go very wrong, assume that it's consistent and panic if not
-                    let reserve = r.strip_suffix("%").unwrap().parse::<i64>().unwrap();
+                    let reserve = r
+                        .strip_suffix("%")
+                        .expect("Unable to parse value for root-reserve")
+                        .parse::<i64>()
+                        .expect("Unable to parse value for root-reserve");
                     fs_mntops.push_str(&format!(r#",createopts="-m {}""#, reserve));
-                    //match reserve {
-                    //    Some(r) => match r.parse::<i64>() {
-                    //        Ok(v) => options.push_str(&format!(r#",createopts="-m {}""#, v)),
-                    //        Err(_) => (),
-                    //    },
-                    //    None => (),
-                    //}
                 }
                 // probably worth panicking here as well
                 _ => panic!("root-reserve was provided on a non-ext filesystem"),
-            },
-            None => (),
+            }
         }
 
         entry.push_str(&fs_mntops);
