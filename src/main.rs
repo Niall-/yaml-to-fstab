@@ -119,21 +119,21 @@ fn main() -> Result<()> {
         // with fs_mntops
         entry.push_str(&format!(" 0 0"));
 
-        // finally some sanity checks with hand written entries
-        // TODO: add some proper tests
-        match device {
-            m if m == "192.168.4.5" => assert_eq!(
-                "192.168.4.5:/var/nfs/home /home nfs defaults,noexec,nosuid 0 0",
-                entry
-            ),
-            m if m == "/dev/sdb1" => assert_eq!(
-                r#"/dev/sdb1 /var/lib/postgresql ext4 defaults,createopts="-m 10" 0 0"#,
-                entry
-            ),
-            m if m == "/dev/sda2" => assert_eq!("/dev/sda2 / ext4 defaults 0 0", entry),
-            m if m == "/dev/sda1" => assert_eq!("/dev/sda1 /boot xfs defaults 0 0", entry),
-            _ => (),
-        }
+        //// finally some sanity checks with hand written entries
+        //// TODO: add some proper tests
+        //match device {
+        //    m if m == "192.168.4.5" => assert_eq!(
+        //        "192.168.4.5:/var/nfs/home /home nfs defaults,noexec,nosuid 0 0",
+        //        entry
+        //    ),
+        //    m if m == "/dev/sdb1" => assert_eq!(
+        //        r#"/dev/sdb1 /var/lib/postgresql ext4 defaults,createopts="-m 10" 0 0"#,
+        //        entry
+        //    ),
+        //    m if m == "/dev/sda2" => assert_eq!("/dev/sda2 / ext4 defaults 0 0", entry),
+        //    m if m == "/dev/sda1" => assert_eq!("/dev/sda1 /boot xfs defaults 0 0", entry),
+        //    _ => (),
+        //}
 
         fstab_entries.push(entry);
     }
