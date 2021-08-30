@@ -42,7 +42,6 @@ fn main() -> Result<()> {
 
         #[allow(unused_assignments)]
         let mut fs_spec = String::new();
-
         // args.export may be empty, for now let's just assume the yaml is correct
         // and provides the value or panic if not
         //
@@ -50,20 +49,19 @@ fn main() -> Result<()> {
         // remote path on the nfs mount and args.mount is the mount point, if this
         // is wrong simply replace args.export and args.mount
         match args.fs_type.to_lowercase().as_ref() {
-            "nfs" => fs_spec.push_str(&format!("{}:{}", &device, args.export.expect("NFS mount with no export path"))),
+            "nfs" => fs_spec.push_str(&format!(
+                "{}:{}",
+                &device,
+                args.export.expect("NFS mount with no export path")
+            )),
             _ => fs_spec.push_str(&device),
         };
-
-        // TODO: if args.mount is a 'valid' UUID, maybe check that it's prefaced
-        // with UUID=?
         entry.push_str(&fs_spec);
         entry.push_str(&format!(" {} {}", args.mount, args.fs_type));
 
         // always including 'defaults' in mntops is most certainly the wrong thing
         // to do here, however as the example yaml file doesn't provide a default
         // value to use we're left to guess what should be here
-        //
-        // alternatives for what to do include accepting user input while running the tool
         let mut fs_mntops = match args.options.len() {
             0 => " defaults".to_string(),
             _ => format!(" defaults,{}", args.options.join(",")),
@@ -118,7 +116,6 @@ fn main() -> Result<()> {
         entry.push_str(&format!(" 0 0"));
 
         //// finally some sanity checks with hand written entries
-        //// TODO: add some proper tests
         //match device {
         //    m if m == "192.168.4.5" => assert_eq!(
         //        "192.168.4.5:/var/nfs/home /home nfs defaults,noexec,nosuid 0 0",
@@ -133,6 +130,9 @@ fn main() -> Result<()> {
         //    _ => (),
         //}
 
+        // tests shouldn't be necessary as serde will panic
+        // if the yaml doesn't contain a mount point and fs type
+        // and those are things we can't really make assumptions about
         fstab_entries.push(entry);
     }
 
