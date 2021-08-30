@@ -30,10 +30,8 @@ struct Mounts {
 }
 
 fn main() -> Result<()> {
-    //let opt = Opt::from_args();
-    //let file = File::open(&opt.conf)?;
-
-    let file = File::open("example.yml")?;
+    let opt = Opt::from_args();
+    let file = File::open(&opt.conf)?;
     let reader = BufReader::new(file);
 
     let mounts: Input = serde_yaml::from_reader(reader)?;
@@ -52,7 +50,7 @@ fn main() -> Result<()> {
         // remote path on the nfs mount and args.mount is the mount point, if this
         // is wrong simply replace args.export and args.mount
         match args.fs_type.to_lowercase().as_ref() {
-            "nfs" => fs_spec.push_str(&format!("{}:{}", &device, args.export.unwrap())),
+            "nfs" => fs_spec.push_str(&format!("{}:{}", &device, args.export.expect("NFS mount with no export path"))),
             _ => fs_spec.push_str(&device),
         };
 
