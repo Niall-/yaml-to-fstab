@@ -1,6 +1,6 @@
 [package]
 name = "yaml-to-fstab"
-version = "0.5.0"
+version = "0.5.2"
 authors = ["Niall Coates <1349685+Niall-@users.noreply.github.com>"]
 edition = "2018"
 
