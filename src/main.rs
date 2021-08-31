@@ -29,7 +29,7 @@ struct Opt {
                 Should be either 0, 1, or 2"
     )]
     fsck: isize,
-    // TODO: this could probably be more granular with /boot and remote filessytems
+    // TODO: this could probably be more granular with /boot and remote filesytems
     #[structopt(
         long,
         help = "Sets the root partition to 1, all other partitions to 2\n\
