@@ -13,6 +13,7 @@ TODO:
 - [ ] Add a flag to set a default value, if any, for fs_mntops
 - [ ] Additional flags for --smart-fsck to optionally disable fsck on /boot,
   swap, or remote filesystems
+- [ ] Pretty print fstab entries by aligning on column length
 
 LIMITATIONS:
 - Currently fs_mntops is always prepended with `defaults` even if the yaml
@@ -54,7 +55,15 @@ OPTIONS:
 ```
 
 ### Typical use
-`# ./target/release/yaml-to-fstab --input=./example.yml --dry-run`
+```
+# ./target/release/yaml-to-fstab --input=./example.yml --dry-run
+--- dry run ---
+Adding to /etc/fstab:    /dev/sda2 / ext4 defaults 0 0
+Adding to /etc/fstab:    /dev/sda1 /boot xfs defaults 0 0
+Adding to /etc/fstab:    192.168.4.5:/var/nfs/home /home nfs defaults,noexec,nosuid 0 0
+Adding to /etc/fstab:    /dev/sdb1 /var/lib/postgresql ext4 defaults,createopts="-m 10" 0 0
+--- dry run ---
+```
 
 
 ### Explanation of flags
