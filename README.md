@@ -1,6 +1,6 @@
 # yaml-to-fstab
 yaml-to-fstab is a tool that will take a yaml document
-(['example.yml'])example.yml)) and
+(['example.yml'](example.yml)) and
 generate and append appropriate entries to /etc/fstab, e.g., as part of an
 automated install.
 
@@ -17,7 +17,8 @@ Rust](https://www.rust-lang.org/tools/install)
 $ cargo build --release
 $ ./target/release/yaml-to-fstab --help`
 
-`yaml-to-fstab 0.5.0
+```
+yaml-to-fstab 0.5.0
 
 USAGE:
     yaml-to-fstab [FLAGS] [OPTIONS] --input <input>
@@ -34,18 +35,19 @@ OPTIONS:
                            Should be either 0 or 1 [default: 0]
         --fsck <fsck>      Global value for fs_passno/fsck
                            Should be either 0, 1, or 2 [default: 0]
-    -i, --input <input>    Input yaml to parse`
+    -i, --input <input>    Input yaml to parse
+```
 
 ### Typical use
 
 `# ./target/release/yaml-to-fstab --input=./example.yml --dry-run`
 
 ### Explanation of flags
-- --input <input>	The input yaml file to parse from
-- --dry-run		Performs a dry run: will not write to /etc/fstab
-- --smart-fsck		If enabled, will set fs_passno/fsck to 1 for root partitions
+- --input <input>:  The input yaml file to parse from
+- --dry-run:        Performs a dry run: will not write to /etc/fstab
+- --smart-fsck:     If enabled, will set fs_passno/fsck to 1 for root partitions
   and 2 for non-root partitions
-- --dump <dump>		Will set fs_freq/dump to <dump> for **all** entries, if this
+- --dump <dump>:    Will set fs_freq/dump to <dump> for **all** entries, if this
   is undesirable do not use
-- --fsck <fsck>		Will set fs_passno/fsck to <fsck> for **all** entries,
+- --fsck <fsck>:    Will set fs_passno/fsck to <fsck> for **all** entries,
   if this is undesirable do not use
