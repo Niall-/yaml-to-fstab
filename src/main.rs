@@ -67,9 +67,17 @@ fn main() -> Result<()> {
         _ => panic!("--fsck should be between 0 and 2"),
     }
 
-    let path = Path::new(&opt.input);
-    let input_file = File::open(path)?;
+    let input_path = Path::new(&opt.input);
+    let input_file = File::open(input_path).expect("Unable to open input yaml file");
     let input_reader = BufReader::new(input_file);
+
+    let fstab_path = Path::new("/etc/fstab");
+    let fstab_file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .append(true)
+        .open(fstab_path)
+        .expect("Unable to open /etc/fstab");
 
     let mounts: Input = serde_yaml::from_reader(input_reader)?;
 
@@ -155,12 +163,6 @@ fn main() -> Result<()> {
 
     match opt.dry_run {
         false => {
-            let fstab_path = Path::new("/etc/fstab");
-            let fstab_file = OpenOptions::new()
-                .read(true)
-                .write(true)
-                .append(true)
-                .open(fstab_path)?;
             let mut writer = BufWriter::new(fstab_file);
             for f in fstab_entries {
                 let entry = format!("{}\n", f);
