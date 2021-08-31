@@ -21,7 +21,8 @@ LIMITATIONS:
 - Currently there is no support for per-entry dump or fsck options in the
   yaml parsing, --smart-fsck will attempt to provide some defaults with root
   being 1 and everything else being 2, but there's also no support for changing
-  this for filesystems that you may not want to fsck
+  this for filesystems that you may not want to fsck (Default values for dump/fsck
+  will be '0 0' if --dump --fsck and --smart-fsck are omitted)
 
 ## Compiling and running
 Rust and Cargo are required, please see [Install
