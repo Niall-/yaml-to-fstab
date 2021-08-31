@@ -76,8 +76,13 @@ fn main() -> Result<()> {
         .read(true)
         .write(true)
         .append(true)
-        .open(fstab_path)
-        .expect("Unable to open /etc/fstab");
+        .open(fstab_path);
+
+    if !opt.dry_run {
+        if let Err(e) = fstab_file {
+            panic!("Unable to open /etc/fstab: {}", e);
+        }
+    }
 
     let mounts: Input = serde_yaml::from_reader(input_reader)?;
 
@@ -163,7 +168,9 @@ fn main() -> Result<()> {
 
     match opt.dry_run {
         false => {
-            let mut writer = BufWriter::new(fstab_file);
+            // this is checked at the start of the file but still
+            // needs to be unwrapped
+            let mut writer = BufWriter::new(fstab_file.expect("Unable to open /etc/fstab"));
             for f in fstab_entries {
                 let entry = format!("{}\n", f);
                 writer.write(entry.as_bytes())?;
