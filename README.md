@@ -34,7 +34,7 @@ $ ./target/release/yaml-to-fstab --help
 ```
 
 ```
-yaml-to-fstab 0.5.0
+yaml-to-fstab 0.5.2
 
 USAGE:
     yaml-to-fstab [FLAGS] [OPTIONS] --input <input>
@@ -56,12 +56,12 @@ OPTIONS:
 
 ### Typical use
 ```
-# ./target/release/yaml-to-fstab --input=./example.yml --dry-run
+# ./target/release/yaml-to-fstab --input=./example.yml --smart-fsck --dry-run
 --- dry run ---
-Adding to /etc/fstab:    /dev/sda2 / ext4 defaults 0 0
-Adding to /etc/fstab:    /dev/sda1 /boot xfs defaults 0 0
-Adding to /etc/fstab:    192.168.4.5:/var/nfs/home /home nfs defaults,noexec,nosuid 0 0
-Adding to /etc/fstab:    /dev/sdb1 /var/lib/postgresql ext4 defaults,createopts="-m 10" 0 0
+Adding to /etc/fstab:    /dev/sda2 / ext4 defaults 0 1
+Adding to /etc/fstab:    192.168.4.5:/var/nfs/home /home nfs defaults,noexec,nosuid 0 2
+Adding to /etc/fstab:    /dev/sdb1 /var/lib/postgresql ext4 defaults,createopts="-m 10" 0 2
+Adding to /etc/fstab:    /dev/sda1 /boot xfs defaults 0 2
 --- dry run ---
 ```
 
