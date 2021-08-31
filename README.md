@@ -13,9 +13,11 @@ TODO:
 Rust and Cargo are required, please see [Install
 Rust](https://www.rust-lang.org/tools/install)
 
-`$ git clone https://github.com/Niall-/yaml-to-fstab && cd yaml-to-fstab
+```
+$ git clone https://github.com/Niall-/yaml-to-fstab && cd yaml-to-fstab
 $ cargo build --release
-$ ./target/release/yaml-to-fstab --help`
+$ ./target/release/yaml-to-fstab --help
+```
 
 ```
 yaml-to-fstab 0.5.0
@@ -39,15 +41,15 @@ OPTIONS:
 ```
 
 ### Typical use
-
 `# ./target/release/yaml-to-fstab --input=./example.yml --dry-run`
 
+
 ### Explanation of flags
-- --input <input>:  The input yaml file to parse from
+- --input \<input\>:  The input yaml file to parse from
 - --dry-run:        Performs a dry run: will not write to /etc/fstab
 - --smart-fsck:     If enabled, will set fs_passno/fsck to 1 for root partitions
   and 2 for non-root partitions
-- --dump <dump>:    Will set fs_freq/dump to <dump> for **all** entries, if this
+- --dump \<dump\>:    Will set fs_freq/dump to \<dump\> for **all** entries, if this
   is undesirable do not use
-- --fsck <fsck>:    Will set fs_passno/fsck to <fsck> for **all** entries,
+- --fsck \<fsck\>:    Will set fs_passno/fsck to \<fsck\> for **all** entries,
   if this is undesirable do not use
