@@ -1,3 +1,5 @@
+[![Linux Build](https://github.com/Niall-/yaml-to-fstab/actions/workflows/rust.yml/badge.svg)](https://github.com/Niall-/yaml-to-fstab/actions/workflows/rust.yml)
+
 # yaml-to-fstab
 yaml-to-fstab is a tool that will take a yaml document
 (['example.yml'](example.yml)) and
