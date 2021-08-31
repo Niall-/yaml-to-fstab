@@ -10,6 +10,17 @@ TODO:
 - [ ] Accept input via stdin
 - [ ] Specify where to write the output (e.g., the tool is being ran on a
   remote system)
+- [ ] Add a flag to set a default value, if any, for fs_mntops
+- [ ] Additional flags for --smart-fsck to optionally disable fsck on /boot,
+  swap, or remote filesystems
+
+LIMITATIONS:
+- Currently fs_mntops is always prepended with `defaults` even if the yaml
+  file provides option values
+- Currently there is no support for per-entry dump or fsck options in the
+  yaml parsing, --smart-fsck will attempt to provide some defaults with root
+  being 1 and everything else being 2, but there's also no support for changing
+  this for filesystems that you may not want to fsck
 
 ## Compiling and running
 Rust and Cargo are required, please see [Install
@@ -48,7 +59,7 @@ OPTIONS:
 
 ### Explanation of flags
 - --input \<input\>:  The input yaml file to parse from
-- --dry-run:        Performs a dry run: will not write to /etc/fstab
+- --dry-run:        Performs a dry run - will not write to /etc/fstab
 - --smart-fsck:     If enabled, will set fs_passno/fsck to 1 for root partitions
   and 2 for non-root partitions
 - --dump \<dump\>:    Will set fs_freq/dump to \<dump\> for **all** entries, if this
